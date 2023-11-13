@@ -1,5 +1,10 @@
 # Patrones-Estructurales
 
+Click [aquí](https://github.com/ESTHERRODRIGUEZGARCIA/Patrones-Estructurales.git) para ver el enlace del repositorio.
+
+Trabajo hecho por:
+1. [Esther Rodríguez García](https://github.com/ESTHERRODRIGUEZGARCIA)
+
 ## Ejercicio 1: Expansión del Sistema Integral de Pizzería "Delizioso" con Menús Personalizados y Almacenamiento en CSV utilizando los Patrones Builder y Composite
 
 Contexto:
