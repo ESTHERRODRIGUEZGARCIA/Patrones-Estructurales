@@ -127,3 +127,19 @@ Enunciado del Problema:
 - Correcta implementación y resultados esperados: 0-5 puntos.
 
 
+
+Añadir a la pizzeria
+combo con composite: n bebidas, n pizzas, n postres
+crear tu combo: una bebida, una pizza ya predefinida, un postre
+cada pedido es un token con un id
+
+generar un id en el csv
+base d e datos relacionr sql conectar con cualquiero orm(piramid) : básico flsh
+
+Parte2:
+hacer un registro: como se hace: se utilizan los logs (usuario, ontraseña...) vale con un txt pero mejor csv de quien ha acceido y eso.
+(las url link)
+
+libreria que nos hace el proxy y los registros: logging; log4python
+generr crpetas que guarden ficheros donde hay que tener datos qu se acumplen. Cada doc va a tener un nombre. Base de datos jerarquizada. como hacer un json sin saber que es un json. JERARQUIA-> vamos a tener diccionaarios key value key value key value. 
+
