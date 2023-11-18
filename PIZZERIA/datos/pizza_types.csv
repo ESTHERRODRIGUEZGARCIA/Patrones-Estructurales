@@ -1,0 +1,11 @@
+pizza_type_id,name,category,ingredients
+bbq_ckn,The Barbecue Pizza,Chicken,"Barbecued Chicken, Red Peppers, Green Peppers, Tomatoes, Red Onions, Barbecue Sauce"
+ckn_pesto,The Pesto Pizza,Chicken,"Chicken, Tomatoes, Red Peppers, Spinach, Garlic, Pesto Sauce"
+hawaiian,The Hawaiian Pizza,Classic,"Sliced Ham, Pineapple, Mozzarella Cheese"
+brie_carre,The Brie Carre Pizza,Supreme,"Brie Carre Cheese, Prosciutto, Caramelized Onions, Pears, Thyme, Garlic"
+calabrese,The Calabrese Pizza,Supreme,"�Nduja Salami, Pancetta, Tomatoes, Red Onions, Friggitello Peppers, Garlic"
+ital_supr,The Italian Supreme Pizza,Supreme,"Calabrese Salami, Capocollo, Tomatoes, Red Onions, Green Olives, Garlic"
+soppressata,The Soppressata Pizza,Supreme,"Soppressata Salami, Fontina Cheese, Mozzarella Cheese, Mushrooms, Garlic"
+spicy_ital,The Spicy Italian Pizza,Supreme,"Capocollo, Tomatoes, Goat Cheese, Artichokes, Peperoncini verdi, Garlic"
+five_cheese,The Five Cheese Pizza,Veggie,"Mozzarella Cheese, Provolone Cheese, Smoked Gouda Cheese, Romano Cheese, Blue Cheese, Garlic"
+veggie_veg,The Vegetables Pizza,Veggie,"Mushrooms, Tomatoes, Red Peppers, Green Peppers, Red Onions, Zucchini, Spinach, Garlic"
