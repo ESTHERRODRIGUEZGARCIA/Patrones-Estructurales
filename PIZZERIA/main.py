@@ -9,6 +9,7 @@ import time
 import csv
 from menu_personalizada import *
 from builder import PizzaBuilder, CustomerBuilder
+from combo_composite import Combo, IndividualItem
 
 def display_pizza_menu(menu):
     print("Menú de pizzas:")

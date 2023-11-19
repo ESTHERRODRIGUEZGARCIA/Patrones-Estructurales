@@ -55,10 +55,13 @@ def load_pizza_menu(filename):
     try:
         with open(filename, mode='r', newline='') as file:
             reader = csv.DictReader(file)
-            for i, row in enumerate(reader, 1):
-                pizza_name = row['name']
-                print(f"{i}. {pizza_name}")
-                menu.append(pizza_name)
+            for row in reader:
+                menu.append({
+                    "name": row['name'],
+                    "category": row['category'],
+                    "ingredients": row['ingredients']
+                    # Añade otras claves según sea necesario
+                })
     except Exception as e:
         print(f"Error al cargar el menú de pizzas: {str(e)}")
     return menu
