@@ -1,4 +1,7 @@
 from combo_composite import *
+import csv
+import uuid
+import os
 #creo las instancias de las pizzas:
 
 barbacoa = PizzaMenu("Barbacoa", ["Pollo Asado, Pimientos Rojos, Pimientos Verdes, Tomates, Cebollas Moradas, Salsa Barbacoa"], 12)
@@ -48,6 +51,23 @@ def display_options(options, num_choices):
         for i, option in enumerate(category_items, 1):
             print(f"  {i}. {option.get_description()} - {option.get_price()} euros")
 
+def choose_combo(combos):
+    while True:
+        if combo_choice.isdigit():
+            combo_choice = int(combo_choice)
+
+            if 1 <= combo_choice <= len(combos):
+                return combos[combo_choice - 1]
+            else:
+                print("Error: El número de combo ingresado no es válido.")
+        else:
+            print("Error: Ingresa un valor numérico.")
+
+        retry = input("¿Quieres volver a intentarlo? (si/no): ").lower()
+        if retry != 'si':
+            print("Hasta pronto!! ")
+            exit()
+
 def choose_items(category, num_choices):
     selected_items = []
 
@@ -56,15 +76,20 @@ def choose_items(category, num_choices):
         print(f"  {i}. {item.get_description()} - {item.get_price()} euros")
 
     for _ in range(num_choices):
-        item_choice = int(input(f"Ingrese el número del {category[0].__class__.__name__} que desea ({len(selected_items) + 1}/{num_choices}): "))
+        while True:
+            item_choice = input(f"Ingrese el número del {category[0].__class__.__name__} que desea ({len(selected_items) + 1}/{num_choices}): ")
 
-        # Verificamos que la opción ingresada esté dentro del rango
-        if 1 <= item_choice <= len(category):
-            selected_item = category[item_choice - 1]
-            selected_items.append(selected_item)
-        else:
-            print("Opción no válida. Inténtalo de nuevo.")
-            return choose_items(category, num_choices)  # Llamada recursiva si la opción no es válida
+            if item_choice.isdigit():
+                item_choice = int(item_choice)
+
+                if 1 <= item_choice <= len(category):
+                    selected_item = category[item_choice - 1]
+                    selected_items.append(selected_item)
+                    break
+                else:
+                    print("Error: El número de opción ingresado no es válido.")
+            else:
+                print("Error: Ingresa un valor numérico.")
 
     return selected_items
 
@@ -85,6 +110,23 @@ def get_num_choices(combo_name):
     else:
         print("Hasta pronto!! ")  # Opción predeterminada si no coincide con ninguno de los combos conocidos
 
+def save_order_to_csv(order_id, combo_type, total_price):
+    file_path = "PIZZERIA/datos/combos.csv"
+
+    # Verificar si el archivo CSV ya existe
+    file_exists = os.path.exists(file_path)
+
+    with open(file_path, mode='a', newline='') as csv_file:
+        fieldnames = ['OrderID', 'ComboType', 'TotalPrice']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+        # Escribir encabezados solo si es un nuevo archivo
+        if not file_exists:
+            writer.writeheader()
+
+        # Escribir la información del pedido
+        writer.writerow({'OrderID': order_id, 'ComboType': combo_type, 'TotalPrice': total_price})
+
 
 def main():
     # Crear listas con las instancias de pizzas, entrantes, bebidas, postres y combos...
@@ -95,7 +137,7 @@ def main():
     pizzas = [barbacoa, pesto, hawaiana, brie_carre, calabresa, italiana_suprema, soppressata, italiana_picante, cinco_quesos, vegetariana]
     postres = [tarta_queso, tarta_abuela, helado, mus_limon, tarta_chocolate]
 
-    print("Bienvenido a la Pizzería Deliciosa!\n")
+    print("Bienvenido a la Pizzería Delizzioso!\n")
 
     # Mostrar opciones de combos
     display_combos(combos)
@@ -140,6 +182,13 @@ def main():
             print(f"  - {item.get_description()} - {item.get_price()} euros")
 
     print(f"\nPrecio total: {combo_price} euros")
+
+    # Generar un ID único para el pedido
+    order_id = str(uuid.uuid4())
+
+    # Guardar el pedido en el archivo CSV
+    save_order_to_csv(order_id, selected_combo.get_name(), combo_price)
+
 
 if __name__ == "__main__":
     main()
