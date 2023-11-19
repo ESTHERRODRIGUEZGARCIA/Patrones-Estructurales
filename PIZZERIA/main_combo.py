@@ -13,21 +13,21 @@ cinco_quesos = PizzaMenu("Cinco Quesos", ["Queso Mozzarella, Queso Provolone, Qu
 vegetariana = PizzaMenu("Vegetariana", ["Champiñones, Tomates, Pimientos Rojos, Pimientos Verdes, Cebollas Rojas, Calabacines, Espinacas, Ajo"], 13)
 
 #creo las instancias de los entrantes:
-croquetas = Entrantes("Croquetas", [jamón, queso], 1)
-tequeños = Entrantes("Tequeños", [queso], 2)
-patatas = Entrantes("Patatas Fritas", [patatas fritas], 3)
+croquetas = Entrante("Croquetas", ["jamón, queso"], 1)
+tequeños = Entrante("Tequeños", ["queso"], 2)
+patatas = Entrante("Patatas Fritas", ["patatas fritas"], 3)
 
 #creo las instancias de las bebidas:
-refresco = Bebidas("Refresco", 3)
-agua = Bebidas("Agua", 2)
-vino = Bebidas("Vino", 5)
+refresco = Bebida("Refresco", 3)
+agua = Bebida("Agua", 2)
+vino = Bebida("Vino", 5)
 
 #creo las instancias de los postres:
-tarta_queso = Postres("Tarta de Queso", 7)
-tarta_abuela = Postres("Tarta de la Abuela", 5)
-helado = Postres("Helado", 4)
-mus_limon = Postres("Mus de Limon", 5)
-tarta_chocolate = Postres("Tarta 3 Chocolates", 7)
+tarta_queso = Postre("Tarta de Queso", 7)
+tarta_abuela = Postre("Tarta de la Abuela", 5)
+helado = Postre("Helado", 4)
+mus_limon = Postre("Mus de Limon", 5)
+tarta_chocolate = Postre("Tarta 3 Chocolates", 7)
 
 #creo las instancias de los combos:
 individual = Combo("Individual")
@@ -39,7 +39,7 @@ super_combo = Combo("Super")
 def display_combos(combos):
     print("Opciones de combos:")
     for i, combo in enumerate(combos, 1):
-        print(f"{i}. {combo.get_name()} Combo")
+        print(f"{i}. {combo.get_description()}")
 
 def display_options(options):
     print("Opciones disponibles:")
@@ -61,6 +61,9 @@ def main():
     # Elegir un combo
     combo_choice = int(input("\nElige el número del combo que deseas: "))
     selected_combo = combos[combo_choice - 1]
+
+    # Aplicar descuento según el tipo de combo
+    selected_combo.apply_discount()
 
     # Mostrar opciones dentro del combo elegido
     display_options(selected_combo.get_items())

@@ -14,7 +14,7 @@ class ComboItem(ABC):
 class Combo(ComboItem):
     def __init__(self, name, discount):
         self.name = name
-        self.discount = discount
+        self.discount = 0
         self.items = []
 
     def add_item(self, item):
@@ -25,27 +25,39 @@ class Combo(ComboItem):
 
     def get_price(self):
         total_price = sum(item.get_price() for item in self.items)
-        total_price -= total_price * self.discount
-        return total_price
+        discounted_price = total_price - (total_price * self.discount)
+        return discounted_price
+
+    def apply_discount(self):
+        if self.name == "Couple":
+            self.discount = 0.05
+        elif self.name == "Trio":
+            self.discount = 0.1
+        elif self.name == "Family":
+            self.discount = 0.15
+        elif self.name == "Super":
+            self.discount = 0.2
 
 class Entrante(ComboItem):
-    def __init__(self, name, price):
+    def __init__(self, name, ingredients, price):
         self.name = name
+        self.ingredients = ingredients
         self.price = price
 
     def get_description(self):
-        return self.name
+        return f"{self.name} - {', '.join(self.ingredients)}"
 
     def get_price(self):
         return self.price
 
 class PizzaMenu(ComboItem):
-    def __init__(self, name, price):
+    def __init__(self, name, ingredients, price):
         self.name = name
+        self.ingredients = ingredients
         self.price = price
 
     def get_description(self):
-        return self.name
+        return f"{self.name} - {', '.join(self.ingredients)}"
 
     def get_price(self):
         return self.price
