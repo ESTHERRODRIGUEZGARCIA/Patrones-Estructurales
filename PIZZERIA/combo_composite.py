@@ -12,16 +12,24 @@ class ComboItem(ABC):
 
 
 class Combo(ComboItem):
-    def __init__(self, name, discount):
+    def __init__(self, name):
         self.name = name
+        self.items = {
+            'entrantes': [],
+            'pizzas': [],
+            'bebidas': [],
+            'postres': []
+        }
         self.discount = 0
-        self.items = []
 
-    def add_item(self, item):
-        self.items.append(item)
+    def add_item(self, item, category):
+        self.items[category].append(item)
 
     def get_description(self):
         return f"{self.name} Combo"
+    
+    def get_items(self):
+        return self.items
 
     def get_price(self):
         total_price = sum(item.get_price() for item in self.items)
