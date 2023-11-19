@@ -31,10 +31,10 @@ tarta_chocolate = Postre("Tarta 3 Chocolates", 7)
 
 #creo las instancias de los combos:
 individual = Combo("Individual")
-couple = Combo("Couple")
-trio = Combo("Trio")
-family = Combo("Family")
-super_combo = Combo("Super")
+couple = Combo("Couple (5% de descuento)")
+trio = Combo("Trio (10% de descuento)")
+family = Combo("Family (15% de descuento)")
+super_combo = Combo("Super (20% de descuento)")
 
 def display_combos(combos):
     print("Opciones de combos:")
