@@ -23,7 +23,10 @@ class Combo(ComboItem):
         self.discount = 0
 
     def add_item(self, item, category):
-        self.items[category].append(item)
+        if isinstance(item, list):
+            self.items[category].extend(item)
+        else:
+            self.items[category].append(item)
 
     def get_description(self):
         return f"{self.name} Combo"
@@ -31,8 +34,12 @@ class Combo(ComboItem):
     def get_items(self):
         return self.items
 
+    def get_name(self):
+        return self.name
+
     def get_price(self):
-        total_price = sum(item.get_price() for item in self.items)
+        self.apply_discount()
+        total_price = sum(item.get_price() for category_items in self.items.values() for item in category_items)
         discounted_price = total_price - (total_price * self.discount)
         return discounted_price
 

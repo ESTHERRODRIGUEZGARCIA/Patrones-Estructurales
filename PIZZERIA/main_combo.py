@@ -43,21 +43,57 @@ def display_combos(combos):
 
 def display_options(options, num_choices):
     print("\nOpciones disponibles:")
-    for i, option in enumerate(options, 1):
-        print(f"  {i}. {option.get_description()} - {option.get_price()} euros")
+    for category, category_items in options.items():
+        print(f"\n{category.capitalize()}:")
+        for i, option in enumerate(category_items, 1):
+            print(f"  {i}. {option.get_description()} - {option.get_price()} euros")
 
 def choose_items(category, num_choices):
     selected_items = []
+
+    print(f"\nElige {category[0].__class__.__name__}s:")
+    for i, item in enumerate(category, 1):
+        print(f"  {i}. {item.get_description()} - {item.get_price()} euros")
+
     for _ in range(num_choices):
-        item_choice = int(input(f"Elige {category} {len(selected_items) + 1}/{num_choices}: "))
-        selected_item = category[item_choice - 1]
-        selected_items.append(selected_item)
+        item_choice = int(input(f"Ingrese el número del {category[0].__class__.__name__} que desea ({len(selected_items) + 1}/{num_choices}): "))
+
+        # Verificamos que la opción ingresada esté dentro del rango
+        if 1 <= item_choice <= len(category):
+            selected_item = category[item_choice - 1]
+            selected_items.append(selected_item)
+        else:
+            print("Opción no válida. Inténtalo de nuevo.")
+            return choose_items(category, num_choices)  # Llamada recursiva si la opción no es válida
+
     return selected_items
+
+
+def get_num_choices(combo_name):
+    combo_name_lower = combo_name.lower()
+
+    if "individual" in combo_name_lower:
+        return 1
+    elif "couple" in combo_name_lower:
+        return 2
+    elif "trio" in combo_name_lower:
+        return 3
+    elif "family" in combo_name_lower:
+        return 4
+    elif "super" in combo_name_lower:
+        return 5
+    else:
+        print("Hasta pronto!! ")  # Opción predeterminada si no coincide con ninguno de los combos conocidos
+
 
 def main():
     # Crear listas con las instancias de pizzas, entrantes, bebidas, postres y combos...
 
     combos = [individual, couple, trio, family, super_combo]
+    entrantes = [croquetas, tequeños, patatas]
+    bebidas = [refresco, agua, vino]
+    pizzas = [barbacoa, pesto, hawaiana, brie_carre, calabresa, italiana_suprema, soppressata, italiana_picante, cinco_quesos, vegetariana]
+    postres = [tarta_queso, tarta_abuela, helado, mus_limon, tarta_chocolate]
 
     print("Bienvenido a la Pizzería Deliciosa!\n")
 
@@ -68,41 +104,41 @@ def main():
     combo_choice = int(input("\nElige el número del combo que deseas: "))
     selected_combo = combos[combo_choice - 1]
 
+    # Obtener el número de opciones que el usuario debe elegir
+    num_choices = get_num_choices(selected_combo.get_name())
+
+
     # Aplicar descuento según el tipo de combo
     selected_combo.apply_discount()
 
-    # Determinar el número de elementos que el usuario debe elegir
-    num_choices = int(selected_combo.get_name().lower().count('combo'))
+    # Elegir entrantes
+    entrantes_seleccionados = choose_items(entrantes, num_choices)
+    selected_combo.add_item(entrantes_seleccionados, 'entrantes')
 
-    # Mostrar opciones dentro del combo elegido
-    display_options(selected_combo.items, num_choices)
+    # Elegir pizzas
+    pizzas_seleccionadas = choose_items(pizzas, num_choices)
+    selected_combo.add_item(pizzas_seleccionadas, 'pizzas')
 
-    # Elegir opciones dentro del combo
-    selected_items = []
+    # Elegir bebidas
+    bebidas_seleccionadas = choose_items(bebidas, num_choices)
+    selected_combo.add_item(bebidas_seleccionadas, 'bebidas')
 
-    # Elegir un entrante
-    selected_items.extend(choose_items(entrantes, num_choices))
-
-    # Elegir una bebida
-    selected_items.extend(choose_items(bebidas, num_choices))
-
-    # Elegir una pizza
-    selected_items.extend(choose_items(pizzas, num_choices))
-
-    # Elegir un postre
-    selected_items.extend(choose_items(postres, num_choices))
-
-    # Agregar opciones al combo
-    for item in selected_items:
-        selected_combo.add_item(item)
+    # Elegir postres
+    postres_seleccionados = choose_items(postres, num_choices)
+    selected_combo.add_item(postres_seleccionados, 'postres')
 
     # Calcular precio del combo y mostrar resultados
     combo_price = selected_combo.get_price()
-    print("\nResumen del pedido:")
-    print(f"Combo seleccionado: {selected_combo.get_name()}")
+    print("\nResumen final del pedido:")
+    print(f"Combo seleccionado: {selected_combo.get_description()}")
     print("Elementos:")
-    for item in selected_items:
-        print(f"  - {item.get_description()} - {item.get_price()} euros")
+    
+    # Mostrar resumen detallado
+    for category, items in selected_combo.items.items():
+        print(f"\n{category.capitalize()}:")
+        for item in items:
+            print(f"  - {item.get_description()} - {item.get_price()} euros")
+
     print(f"\nPrecio total: {combo_price} euros")
 
 if __name__ == "__main__":
