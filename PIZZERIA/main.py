@@ -4,7 +4,6 @@
 # y la personalización. 
 # SOLID: cada clase o módulo tenga una sola razón para cambiar.
 
-# main.py
 import time
 import csv
 from menu_personalizada import *
