@@ -6,19 +6,6 @@ class PizzaApp(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.pizza_menu = [
-            {"name": "The Barbecue Pizza"},
-            {"name": "The Pesto Pizza"},
-            {"name": "The Hawaiian Pizza"},
-            {"name": "The Brie Carre Pizza"},
-            {"name": "The Calabrese Pizza"},
-            {"name": "The Italian Supreme Pizza"},
-            {"name": "The Soppressata Pizza"},
-            {"name": "The Spicy Italian Pizza"},
-            {"name": "The Five Cheese Pizza"},
-            {"name": "The Vegetables Pizza"}
-        ]
-
         self.customer_counter = 0
 
         self.init_ui()
@@ -32,24 +19,9 @@ class PizzaApp(QWidget):
         self.label = QLabel('¡Bienvenido a Delizioso Pizzeria!', self)
         self.layout.addWidget(self.label)
 
-        recommendations_label = QLabel(
-            "\nRECOMENDACIÓN:\n\nTop 5 mejores pizzas servidas por 'Delizioso Pizzeria':\n"
-            "1. Pizza con setas, queso fresco, jamón ibérico, trufa\n"
-            "2. Pizza con ricota, jamón, pesto de cebollino\n"
-            "3. Pizza de verduras (sin tomate), aguacate, jamón ibérico\n"
-            "4. Pizza de berenjena, kale, jamón\n"
-            "5. Pizza de calabaza, queso, jamón\n\n"
-            "En cuanto a vinos:\n"
-            "1. Borsao Joven Selección 2021\n"
-            "2. Marqués de Cáceres Verdejo 2022\n"
-            "3. Viña Zorzal Rosado Garnacha 2022\n\n"
-            "Si prefieres refresco, disponemos de gran variedad.",
-            self
-        )
-        self.layout.addWidget(recommendations_label)
 
-        menu_button = QPushButton('Elegir una pizza del menú', self)
-        menu_button.clicked.connect(self.display_pizza_menu)
+        menu_button = QPushButton('Elegir un Combo', self)
+        menu_button.clicked.connect(self.display_combo)
         self.layout.addWidget(menu_button)
 
         customize_button = QPushButton('Personalizar tu pizza', self)
@@ -61,13 +33,11 @@ class PizzaApp(QWidget):
         self.layout.addWidget(exit_button)
 
         self.setLayout(self.layout)
+    
+    def display_combo(self):
+        self.combo_window = ComboWindow()
+        self.combo_window.show()
 
-    def display_pizza_menu(self):
-        items = [f"{i + 1}. {pizza['name']}" for i, pizza in enumerate(self.pizza_menu)]
-        item, ok_pressed = QInputDialog.getItem(self, "Elegir una pizza", "Selecciona una pizza:", items, 0, False)
-        if ok_pressed and item:
-            pizza_number = int(item.split(".")[0])
-            print(f"Has elegido la pizza {pizza_number}: {self.pizza_menu[pizza_number - 1]['name']}")
 
     def customize_pizza(self):
         self.customer_counter += 1
@@ -136,8 +106,57 @@ class CustomPizzaBuilder:
     def build(self):
         return self.pizza_info
 
+class ComboWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.init_ui()
+    
+    def init_ui(self):
+        self.setWindowTitle('Elegir Combo')
+        self.setGeometry(300, 300, 400, 300)
+
+        self.layout = QVBoxLayout()
+
+        self.label = QLabel('Opciones de combos', self)
+        self.layout.addWidget(self.label)
+
+        couple_button = QPushButton('Couple', self)
+        couple_button.clicked.connect(self.choose_combo)
+        self.layout.addWidget(couple_button)
+
+        trio_button = QPushButton('Trio', self)
+        trio_button.clicked.connect(self.choose_combo)
+        self.layout.addWidget(trio_button)
+
+        family_button = QPushButton('Family', self)
+        family_button.clicked.connect(self.choose_combo)
+        self.layout.addWidget(family_button)
+
+        super_button = QPushButton('Super', self)
+        super_button.clicked.connect(self.choose_combo)
+        self.layout.addWidget(super_button)
+
+        self.setLayout(self.layout)
+    
+    def choose_combo(self):
+        sender = self.sender()
+        combo_name = sender.text()
+
+        combo = Combo(combo_name)
+        combo.get_items()
+
+        print(f"\nHas elegido el combo {combo.get_name()} con los siguientes productos:")
+        for category, items in combo.get_items().items():
+            print(f"{category}:")
+            for item in items:
+                print(f"  - {item.get_description()}")
+
+        print(f"\nEl precio total es de {combo.get_price()}€")
+
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    pizza_app = PizzaApp()
-    pizza_app.show()
+    window = PizzaApp()
     sys.exit(app.exec_())
