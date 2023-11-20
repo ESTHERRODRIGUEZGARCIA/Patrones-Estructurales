@@ -1,6 +1,6 @@
 import sys
 import csv
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QInputDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QInputDialog, QDialog, QFormLayout
 
 class PizzaApp(QWidget):
     def __init__(self):
@@ -57,7 +57,7 @@ class PizzaApp(QWidget):
         print(pizza_to_serve)
 
         # Guardar los datos del cliente en el archivo CSV
-        save_customer_data("EJERCICIO2/datos/datos_clientes.csv", pizza_to_serve)
+        save_customer_data("PIZZERIA/datos/datos_clientes.csv", pizza_to_serve)
 
     def get_input(self, label):
         text, ok_pressed = QInputDialog.getText(self, "Personalizar pizza", label)
@@ -81,6 +81,10 @@ class CustomPizzaBuilder:
     def __init__(self, customer_number):
         self.customer_number = customer_number
         self.pizza_info = {}
+    
+    def set_customer_number(self, customer_number):
+        self.customer_number = customer_number
+
 
     def set_pizza_masa(self, masa):
         self.pizza_info['masa'] = masa
@@ -121,42 +125,71 @@ class ComboWindow(QWidget):
         self.label = QLabel('Opciones de combos', self)
         self.layout.addWidget(self.label)
 
-        couple_button = QPushButton('Couple', self)
-        couple_button.clicked.connect(self.choose_combo)
-        self.layout.addWidget(couple_button)
-
-        trio_button = QPushButton('Trio', self)
-        trio_button.clicked.connect(self.choose_combo)
-        self.layout.addWidget(trio_button)
-
-        family_button = QPushButton('Family', self)
-        family_button.clicked.connect(self.choose_combo)
-        self.layout.addWidget(family_button)
-
-        super_button = QPushButton('Super', self)
-        super_button.clicked.connect(self.choose_combo)
-        self.layout.addWidget(super_button)
+        # Crear botones para cada tipo de combo
+        for combo_type in [individual, couple, trio, family, super_combo]:
+            combo_button = QPushButton(combo_type.get_name(), self)
+            combo_button.clicked.connect(self.choose_combo_type)
+            self.layout.addWidget(combo_button)
 
         self.setLayout(self.layout)
     
-    def choose_combo(self):
+    def choose_combo_type(self):
         sender = self.sender()
-        combo_name = sender.text()
+        combo_type_name = sender.text()
 
-        combo = Combo(combo_name)
-        combo.get_items()
+        # Abrir una nueva ventana o diálogo para elegir elementos según el tipo de combo
+        combo_type = Combo(combo_type_name)
+        elements_dialog = ComboElementsDialog(combo_type)
+        elements_dialog.exec_()  # Ejecutar el diálogo de forma modal
 
-        print(f"\nHas elegido el combo {combo.get_name()} con los siguientes productos:")
-        for category, items in combo.get_items().items():
-            print(f"{category}:")
+class ComboElementsDialog(QDialog):
+    def __init__(self, combo_type):
+        super().__init__()
+
+        self.combo_type = combo_type
+
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle(f'Elegir elementos para {self.combo_type.get_name()}')
+        self.setGeometry(400, 400, 400, 300)
+
+        self.layout = QVBoxLayout()
+
+        self.label = QLabel(f'Elegir elementos para {self.combo_type.get_name()}', self)
+        self.layout.addWidget(self.label)
+
+        # Crear formularios para cada categoría de elementos
+        form_layout = QFormLayout()
+        for category, items in self.combo_type.get_items().items():
             for item in items:
-                print(f"  - {item.get_description()}")
+                item_button = QPushButton(item.get_description(), self)
+                item_button.clicked.connect(self.choose_element)
+                form_layout.addRow(item.get_description(), item_button)
 
-        print(f"\nEl precio total es de {combo.get_price()}€")
+        self.layout.addLayout(form_layout)
+
+        self.setLayout(self.layout)
+
+    def choose_element(self):
+        sender = self.sender()
+        element_name = sender.text()
+
+        # Aquí puedes guardar la elección del usuario, calcular el precio, etc.
+        print(f"Has elegido {element_name}")
+
+        # Ejemplo: Calcular el precio total y guardar en el CSV
+        total_price = self.combo_type.get_price()
+        order_id = str(uuid.uuid4())
+        save_order_to_csv(order_id, self.combo_type.get_name(), total_price)
+
+        self.accept()  # Cerrar el diálogo después de elegir los elementos
+
 
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = PizzaApp()
+    pizza_app = PizzaApp()
+    pizza_app.show()
     sys.exit(app.exec_())
