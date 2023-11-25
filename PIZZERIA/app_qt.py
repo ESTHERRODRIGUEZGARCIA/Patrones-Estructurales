@@ -66,7 +66,7 @@ class PizzaApp(QWidget):
 def save_customer_data(file_path, pizza_id, pizza_info):
     try:
         with open(file_path, 'a', newline='') as csvfile:
-            fieldnames = pizza_info.keys()
+            fieldnames = ['id'] + list(pizza_info.keys())
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             # Si el archivo está vacío, escribe los encabezados
@@ -128,6 +128,7 @@ class ComboWindow(QWidget):
             combo_button = QPushButton(combo_type, self)
             combo_button.clicked.connect(lambda _, combo_type=combo_type: self.select_combo(combo_type))
             self.layout.addWidget(combo_button)
+
 
         self.setLayout(self.layout)
         self.selected_items = {'Entrante': [], 'PizzaMenu': [], 'Bebida': [], 'Postre': []}
