@@ -41,6 +41,7 @@ class PizzaApp(QWidget):
     def customize_pizza(self):
         self.customer_counter += 1
         custom_pizza_builder = CustomPizzaBuilder(self.customer_counter)
+        pizza_id = str(uuid.uuid4())
 
         custom_pizza_builder.set_pizza_masa(self.get_input("Tipo de masa (fina o gruesa): "))
         custom_pizza_builder.set_salsa_base(self.get_input("Salsa base (tomate, soja, genovesa): "))
@@ -56,13 +57,13 @@ class PizzaApp(QWidget):
         print(pizza_to_serve)
 
         # Guardar los datos del cliente en el archivo CSV
-        save_customer_data("PIZZERIA/datos/datos_clientes.csv", pizza_to_serve)
+        save_customer_data("PIZZERIA/datos/datos_clientes.csv", pizza_id, pizza_to_serve)
 
     def get_input(self, label):
         text, ok_pressed = QInputDialog.getText(self, "Personalizar pizza", label)
         return text if ok_pressed else ""
 
-def save_customer_data(file_path, pizza_info):
+def save_customer_data(file_path, pizza_id, pizza_info):
     try:
         with open(file_path, 'a', newline='') as csvfile:
             fieldnames = pizza_info.keys()
@@ -72,7 +73,7 @@ def save_customer_data(file_path, pizza_info):
             if csvfile.tell() == 0:
                 writer.writeheader()
 
-            writer.writerow(pizza_info)
+            writer.writerow({'id': pizza_id, **pizza_info})
     except Exception as e:
         print(f"Error al guardar datos del cliente: {e}")
 
@@ -109,10 +110,9 @@ class CustomPizzaBuilder:
     def build(self):
         return self.pizza_info
 
-class ComboDialog(QDialog):
-    def __init__(self, combo):
+class ComboWindow(QWidget):
+    def __init__(self):
         super().__init__()
-        self.combo = combo
         self.init_ui()
 
     def init_ui(self):
@@ -126,46 +126,119 @@ class ComboDialog(QDialog):
 
         for combo_type in ['Individual', 'Couple', 'Trio', 'Family', 'Super']:
             combo_button = QPushButton(combo_type, self)
-            combo_button.clicked.connect(self.select_combo)
+            combo_button.clicked.connect(lambda _, combo_type=combo_type: self.select_combo(combo_type))
             self.layout.addWidget(combo_button)
-        
+
         self.setLayout(self.layout)
+        self.selected_items = {'Entrante': [], 'PizzaMenu': [], 'Bebida': [], 'Postre': []}
+        self.max_selections = {'Individual': 1, 'Couple': 2, 'Trio': 3, 'Family': 4, 'Super': 5}
 
-    def select_combo(self):
-        sender = self.sender()
-        combo_type_name = sender.text()
-
-        combo_elements_dialog = ComboElementsDialog(combo_type_name)
+    def select_combo(self, combo_type):
+        combo_elements_dialog = ComboElementsDialog(combo_type, self.selected_items, self.max_selections[combo_type])
         combo_elements_dialog.exec_()
+
 class ComboElementsDialog(QDialog):
-    def __init__(self, combo_type_name):
+    def __init__(self, combo_type, selected_items, max_selections):
         super().__init__()
-        self.combo_type_name = combo_type_name
+        self.combo_type = combo_type
+        self.selected_items = selected_items
+        self.max_selections = max_selections
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle(f"Elegir elementos para el combo {self.combo_type_name}")
-        self.setGeometry(300, 300, 400, 300)
+        self.setWindowTitle(f"Elegir elementos para el combo {self.combo_type}")
+        self.setGeometry(300, 300, 600, 400)
 
         self.layout = QVBoxLayout()
 
-        self.label = QLabel(f"Elegir elementos para el combo {self.combo_type_name}", self)
+        self.label = QLabel(f"Elegir elementos para el combo {self.combo_type}", self)
         self.layout.addWidget(self.label)
 
-        for combo_item in ['Entrante', 'PizzaMenu', 'Bebida']:
-            combo_item_button = QPushButton(combo_item, self)
-            combo_item_button.clicked.connect(self.select_combo_item)
-            self.layout.addWidget(combo_item_button)
-        
+        for combo_category, options in combo_options.items():
+            combo_category_label = QLabel(f'{combo_category} (Elige {self.max_selections} elementos):', self)
+            self.layout.addWidget(combo_category_label)
+
+            for idx, option in enumerate(options, start=1):
+                option_button = QPushButton(
+                    f"{idx}. {option['name']} - {', '.join(option['ingredients'])} - {option['price']} euros", self)
+                option_button.clicked.connect(lambda _, cat=combo_category, opt=option: self.select_combo_item(cat, opt))
+                self.layout.addWidget(option_button)
+
+        done_button = QPushButton("Finalizar pedido", self)
+        done_button.clicked.connect(self.finalize_order)
+        self.layout.addWidget(done_button)
+
         self.setLayout(self.layout)
 
-    def select_combo_item(self):
-        sender = self.sender()
-        combo_item_name = sender.text()
+    def select_combo_item(self, category, option):
+        if len(self.selected_items[category]) >= self.max_selections:
+            print(f"Ya has elegido {self.max_selections} elementos para la categoría {category}")
+            return
+        self.selected_items[category].append(option)
 
-        combo_item_dialog = ComboItemDialog(self.combo_type_name, combo_item_name)
-        combo_item_dialog.exec_()
-        self.accept()
+    def finalize_order(self):
+        total_price = 0
+        combo_name = f"{self.combo_type} Combo"
+        combo_id = str(uuid.uuid4())
+
+        
+        print(f"\nHas elegido el combo {self.combo_type} con los siguientes elementos:")
+        for category, items in self.selected_items.items():
+            if items:
+                for item in items:
+                    print(f"{category}: {item['name']} - {', '.join(item['ingredients'])} - {item['price']} euros")
+                    total_price += item['price']
+            else:
+                print(f"No has elegido ningún elemento para la categoría {category}")
+
+        print(f"\nEl precio total es de {total_price} euros")
+
+        # Guardar los datos del cliente en el archivo CSV
+        save_customer_data_combo("PIZZERIA/datos/combos.csv", combo_id, combo_name, total_price)
+
+        self.close()
+def save_customer_data_combo(file_path, combo_id, combo_name, price):
+    try:
+        with open(file_path, 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+
+            # Escribir la información del combo en el formato deseado
+            writer.writerow([combo_id, combo_name, price])
+    except Exception as e:
+        print(f"Error al guardar datos del combo: {e}")
+
+combo_options = {
+    'Entrante': [
+        {'name': 'Croquetas', 'ingredients': ['jamón', 'queso'], 'price': 1},
+        {'name': 'Tequeños', 'ingredients': ['queso'], 'price': 2},
+        {'name': 'Patatas Fritas', 'ingredients': ['patatas fritas'], 'price': 3},
+    ],
+    'PizzaMenu': [
+        {'name': 'Barbacoa', 'ingredients': ['Pollo Asado', 'Pimientos Rojos', 'Pimientos Verdes', 'Tomates', 'Cebollas Moradas', 'Salsa Barbacoa'], 'price': 12},
+        {'name': 'Pesto', 'ingredients': ['Pollo', 'Tomate', 'Pimientos Rojos', 'Espinacas', 'Ajo', 'Salsa Pesto'], 'price': 13},
+        {'name': 'Hawaiana', 'ingredients': ['Jamón lonchas', 'piña', 'queso mozzarella'], 'price': 10},
+        {'name': 'Brie Carré', 'ingredients': ['Queso Brie Carré', 'Prosciutto', 'Cebolla Caramelizada', 'Peras', 'Tomillo', 'Ajo'], 'price': 15},
+        {'name': 'Calabresa', 'ingredients': ['Salami Nduja', 'Pancetta', 'Tomates', 'Cebollas Rojas', 'Pimientos Friggitello', 'Ajo'], 'price': 13},
+        {'name': 'Italiana Suprema', 'ingredients': ['Salami Calabrese', 'Capocollo', 'Tomates', 'Cebollas Rojas', 'Aceitunas Verdes', 'Ajo'], 'price': 20},
+        {'name': 'Soppressata', 'ingredients': ['Salami Soppressata', 'Queso Fontina', 'Queso Mozzarella', 'Champiñones', 'Ajo'], 'price': 15},
+        {'name': 'Italiana Picante', 'ingredients': ['Capocollo', 'Tomates', 'Queso De Cabra', 'Alcachofas', 'Peperoncini Verdi', 'Ajo'], 'price': 17},
+        {'name': 'Cinco Quesos', 'ingredients': ['Queso Mozzarella', 'Queso Provolone', 'Queso Gouda Ahumado', 'Queso Romano', 'Queso Azul', 'Ajo'], 'price': 15},
+        {'name': 'Vegetariana', 'ingredients': ['Champiñones', 'Tomates', 'Pimientos Rojos', 'Pimientos Verdes', 'Cebollas Rojas', 'Calabacines', 'Espinacas', 'Ajo'], 'price': 13},
+    ],
+    'Bebida': [
+        {'name': 'Refresco', 'ingredients': [], 'price': 3},
+        {'name': 'Agua', 'ingredients': [], 'price': 2},
+        {'name': 'Vino', 'ingredients': [], 'price': 5},
+    ],
+    'Postre': [
+        {'name': 'Tarta de Queso', 'ingredients': [], 'price': 7},
+        {'name': 'Tarta de la Abuela', 'ingredients': [], 'price': 5},
+        {'name': 'Helado', 'ingredients': [], 'price': 4},
+        {'name': 'Mus de Limon', 'ingredients': [], 'price': 5},
+        {'name': 'Tarta 3 Chocolates', 'ingredients': [], 'price': 7},
+    ],
+}
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
