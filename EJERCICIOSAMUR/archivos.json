@@ -1,0 +1,65 @@
+{
+    "documentos": [
+      {
+        "nombre": "Documento1",
+        "tipo_documento": "Texto",
+        "tamaño": 50,
+        "sensible": true
+      },
+      {
+        "nombre": "Documento2",
+        "tipo_documento": "Imagen",
+        "tamaño": 100,
+        "sensible": false
+      },
+      {
+        "nombre": "Documento3",
+        "tipo_documento": "Video",
+        "tamaño": 200,
+        "sensible": true
+      },
+      {
+        "nombre": "Documento4",
+        "tipo_documento": "Texto",
+        "tamaño": 80,
+        "sensible": false
+      },
+      {
+        "nombre": "Documento5",
+        "tipo_documento": "Imagen",
+        "tamaño": 120,
+        "sensible": true
+      },
+      {
+        "nombre": "Documento6",
+        "tipo_documento": "Audio",
+        "tamaño": 30,
+        "sensible": false
+      },
+      {
+        "nombre": "Documento7",
+        "tipo_documento": "Texto",
+        "tamaño": 60,
+        "sensible": false
+      },
+      {
+        "nombre": "Documento8",
+        "tipo_documento": "Video",
+        "tamaño": 150,
+        "sensible": true
+      },
+      {
+        "nombre": "Documento9",
+        "tipo_documento": "Audio",
+        "tamaño": 40,
+        "sensible": false
+      },
+      {
+        "nombre": "Documento10",
+        "tipo_documento": "Imagen",
+        "tamaño": 90,
+        "sensible": true
+      }
+    ]
+  }
+  

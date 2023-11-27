@@ -1,5 +1,6 @@
 from datetime import datetime
 import csv
+import json
 
 
 # Componente base del patrón Composite
@@ -108,6 +109,44 @@ class AutenticacionUsuarios:
             for user in self.usuarios:
                 writer.writerow(user)
 
+# Función para cargar documentos desde un archivo JSON
+def cargar_documentos_desde_json(nombre_archivo):
+    with open(nombre_archivo, 'r') as file:
+        data = json.load(file)
+        documentos = data.get('documentos', [])
+        return [Documento(doc['nombre'], doc['tipo_documento'], doc['tamaño'], doc.get('sensible', False)) for doc in documentos]
+
+# Clase para manejar la autenticación de usuarios
+class AutenticacionUsuarios:
+    def __init__(self):
+        self.usuarios = []
+
+    def registrar_usuario(self, usuario, contraseña):
+        self.usuarios.append({'usuario': usuario, 'contraseña': contraseña, 'carpeta_personal': None})
+        self.guardar_usuarios_csv()
+
+    def autenticar_usuario(self, usuario, contraseña):
+        for user in self.usuarios:
+            if user['usuario'] == usuario and user['contraseña'] == contraseña:
+                return user
+        return None
+
+    def cargar_usuarios_csv(self):
+        try:
+            with open('usuarios.csv', newline='') as file:
+                reader = csv.DictReader(file)
+                self.usuarios = list(reader)
+        except FileNotFoundError:
+            self.usuarios = []
+
+    def guardar_usuarios_csv(self):
+        with open('usuarios.csv', mode='w', newline='') as file:
+            fieldnames = ['usuario', 'contraseña', 'carpeta_personal']
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            for user in self.usuarios:
+                writer.writerow(user)
+
 
 def main():
     autenticacion = AutenticacionUsuarios()
@@ -130,7 +169,10 @@ def main():
                 print(f"Bienvenido, {usuario_autenticado}!\n")
                 carpeta_personal = user_data['carpeta_personal']
                 if carpeta_personal is None:
-                    carpeta_personal = crear_estructura_ejemplo()
+                    documentos = cargar_documentos_desde_json('documentos.json')
+                    carpeta_personal = Carpeta("CarpetaPersonal")
+                    for doc in documentos:
+                        carpeta_personal.agregar(doc)
                     user_data['carpeta_personal'] = carpeta_personal
                 break
             else:
@@ -154,17 +196,20 @@ def main():
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
-            print(carpeta_personal.mostrar())
-            nombre_documento = input("Ingrese el nombre del documento a acceder: ")
-            documento_seleccionado = None
-            for child in carpeta_personal.hijos:
-                if isinstance(child, Documento) and child.nombre == nombre_documento:
-                    documento_seleccionado = child
-                    break
-            if documento_seleccionado:
-                proxy.acceder_documento(documento_seleccionado)
+            if isinstance(carpeta_personal, Carpeta):  # Verifica si es una instancia de Carpeta
+                print(carpeta_personal.mostrar())
+                nombre_documento = input("Ingrese el nombre del documento a acceder: ")
+                documento_seleccionado = None
+                for child in carpeta_personal.hijos:
+                    if isinstance(child, Documento) and child.nombre == nombre_documento:
+                        documento_seleccionado = child
+                        break
+                if documento_seleccionado:
+                    proxy.acceder_documento(documento_seleccionado)
+                else:
+                    print("Documento no encontrado.\n")
             else:
-                print("Documento no encontrado.\n")
+                print("La carpeta personal no está correctamente configurada. Asegúrate de cargar los documentos correctamente.\n")
         elif opcion == '2':
             exit()
         else:
