@@ -1,7 +1,7 @@
-from proxy import ProxyAcceso
+from proxy import ProxyEnlace, ProxyCarpeta, ProxyDocumento
 from composite import Carpeta
 from ver_usuarios import AutenticacionUsuarios
-from cargar_json import cargar_desde_json
+from cargar_json import cargar_desde_json, guardar_json
 from interaccion import acceder_a_elemento, añadir_elemento_aleatorio, eliminar_elemento
 
 
@@ -42,7 +42,7 @@ def main():
         else:
             print("Opción no válida. Inténtelo de nuevo.\n")
 
-    proxy = ProxyAcceso(usuario_autenticado)
+    proxy = ProxyDocumento(usuario_autenticado)
 
     while True:
         print("1. Acceder a documentos")
@@ -63,8 +63,10 @@ def main():
                     break
         elif opcion == '2':
             añadir_elemento_aleatorio(carpeta_personal)
+            guardar_json('archivos.json', carpeta_personal)
         elif opcion == '3':
             eliminar_elemento(carpeta_personal)
+            guardar_json('archivos.json', carpeta_personal)
         elif opcion == '4':
             exit()
         else:
