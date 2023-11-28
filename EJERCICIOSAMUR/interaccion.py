@@ -33,28 +33,53 @@ def acceder_a_enlace(carpeta_personal):
         else:
             print("Opción no válida. Inténtelo de nuevo.\n")
 
-def crear_documento(carpeta_personal):
-    while True:
-        nombre_documento = input("Nombre del documento: ")
-        tipo_documento = input("Tipo del documento: ")
-        tamanio_documento = input("Tamaño del documento (en KB): ")
-        sensible_documento = input("¿Es sensible? (s/n): ")
-        if sensible_documento == 's':
-            sensible_documento = True
-        elif sensible_documento == 'n':
-            sensible_documento = False
-        else:
-            print("Opción no válida. Inténtelo de nuevo.\n")
-            continue
-        documento = Documento(nombre_documento, tipo_documento, tamanio_documento, sensible_documento)
-        carpeta_personal.agregar(documento)
-        return carpeta_personal
+def buscar_documento(nombre, carpeta_actual):
+    """
+    Busca un documento por nombre en la carpeta actual y sus subcarpetas recursivamente.
 
-def eliminar_documento(carpeta_personal):
-    while True:
-        nombre_documento = input("Nombre del documento: ")
-        for documento in carpeta_personal.contenido:
-            if isinstance(documento, Documento) and documento.nombre == nombre_documento:
-                carpeta_personal.eliminar(documento)
-                return carpeta_personal
-        print("No se encontró el documento. Inténtelo de nuevo.\n")
+    Parameters:
+    - nombre (str): El nombre del documento a buscar.
+    - carpeta_actual (dict): La carpeta actual en la que se debe realizar la búsqueda.
+
+    Returns:
+    - dict or None: Devuelve el documento si se encuentra, o None si no se encuentra.
+    """
+    for documento in carpeta_actual['contenido']:
+        if documento['nombre'] == nombre:
+            return documento
+        elif documento['tipo'] == 'Carpeta':
+            # Si el documento actual es una carpeta, realiza la búsqueda recursiva en esa carpeta.
+            resultado_busqueda = buscar_documento(nombre, documento)
+            if resultado_busqueda:
+                return resultado_busqueda
+
+    # Si no se encuentra el documento en la carpeta actual ni en sus subcarpetas, devuelve None.
+    return None
+
+
+# Función para añadir un nuevo documento a una carpeta
+def añadir_documento(nombre, tipo, tamaño, sensible, accesos, carpeta_actual):
+    nuevo_documento = {
+        "nombre": nombre,
+        "tipo": tipo,
+        "tamaño": tamaño,
+        "sensible": sensible,
+        "accesos": accesos
+    }
+    carpeta_actual['contenido'].append(nuevo_documento)
+
+# Función para eliminar un documento de una carpeta
+def eliminar_documento(nombre, carpeta_actual):
+    documento = buscar_documento(nombre, carpeta_actual)
+    if documento:
+        carpeta_actual['contenido'].remove(documento)
+        print(f"Documento '{nombre}' eliminado.")
+    else:
+        print(f"Documento '{nombre}' no encontrado.")
+
+
+# Función para mostrar el contenido de una carpeta
+def mostrar_contenido(carpeta_actual):
+    print(f"Contenido de la carpeta '{carpeta_actual['nombre']}':")
+    for documento in carpeta_actual['contenido']:
+        print(f"- {documento['nombre']} ({documento['tipo']})")
