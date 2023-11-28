@@ -1,7 +1,9 @@
-from cargar_json import cargar_desde_json
-from interaccion import acceder_a_carpeta, acceder_a_enlace, crear_documento, eliminar_documento
-from proxy import ProxyAcceso, proxy
+from proxy import ProxyAcceso
+from composite import Carpeta, Documento, Enlace
 from ver_usuarios import AutenticacionUsuarios
+from cargar_json import cargar_desde_json
+from interaccion import acceder_a_elemento, añadir_elemento_aleatorio, eliminar_elemento
+
 
 def main():
     autenticacion = AutenticacionUsuarios()

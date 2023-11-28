@@ -91,4 +91,4 @@ def eliminar_elemento(carpeta_actual):
 # Función principal para interactuar con el sistema
 def interactuar_con_sistema(usuario, carpeta_raiz):
     print(f"Bienvenido, {usuario}.\n")
-    acceder_a_elemento(carpeta_raiz)
+    acceder_a_elemento(carpeta_raiz, usuario)
