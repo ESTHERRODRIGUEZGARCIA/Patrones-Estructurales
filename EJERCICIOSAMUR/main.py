@@ -27,7 +27,7 @@ def main():
                 print(f"Bienvenido, {usuario_autenticado}!\n")
                 carpeta_personal = user_data['carpeta_personal']
                 if carpeta_personal is None:
-                    carpeta_personal = cargar_desde_json('estructura_usuario.json')
+                    carpeta_personal = cargar_desde_json('archivos.json')
                     user_data['carpeta_personal'] = carpeta_personal
                 break
             else:
@@ -46,27 +46,26 @@ def main():
 
     while True:
         print("1. Acceder a documentos")
-        print("2. Salir")
+        print("2. Añadir elemento")
+        print("3. Eliminar elemento")
+        print("4. Salir")
 
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
             carpeta_actual = carpeta_personal
             while True:
-                if isinstance(carpeta_actual, Carpeta):  # Verifica que carpeta_actual sea una instancia de Carpeta
+                if isinstance(carpeta_actual, Carpeta):  
                     print("Carpeta actual:", carpeta_actual.nombre)
-                    carpeta_o_enlace = acceder_a_carpeta_o_enlace(carpeta_actual)
-                    if isinstance(carpeta_o_enlace, Documento):
-                        proxy.acceder_documento(carpeta_o_enlace)
-                        print("Interacción ficticia para el documento.")
-                    elif isinstance(carpeta_o_enlace, Carpeta):
-                        carpeta_actual = carpeta_o_enlace
-                    else:
-                        print("Error desconocido al acceder a carpeta/enlace.")
+                    acceder_a_elemento(carpeta_actual, usuario_autenticado)
                 else:
                     print("La carpeta actual no es válida.")
                     break
         elif opcion == '2':
+            añadir_elemento_aleatorio(carpeta_personal)
+        elif opcion == '3':
+            eliminar_elemento(carpeta_personal)
+        elif opcion == '4':
             exit()
         else:
             print("Opción no válida. Inténtelo de nuevo.\n")
