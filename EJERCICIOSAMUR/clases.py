@@ -1,27 +1,32 @@
 from datetime import datetime
 import csv
-
+import json
 
 # Componente base del patrón Composite
 class Componente:
-    def __init__(self, nombre):
+    def __init__(self, nombre, tipo):
         self.nombre = nombre
+        self.tipo = tipo
 
-    def mostrar(self):
-        pass
+    def mostrar(self, nivel=0):
+        indentacion = " "*nivel
+        resultado = f"{indentacion}{self.nombre}/ (Tipo: {self.tipo})\n"
+        return resultado
 
 # Hoja del Composite - representa un documento
 class Documento(Componente):
-    def __init__(self, nombre, tipo_documento, tamaño, sensible=False):
+    def __init__(self, nombre, tipo, tamanio, sensible):
         super().__init__(nombre)
-        self.tipo_documento = tipo_documento
-        self.tamaño = tamaño
+        self.tipo = tipo
+        self.tamanio = tamanio
         self.sensible = sensible
-        self.registro_acceso = []
+        self.accesos = []
 
-    def mostrar(self):
-        return f"{self.nombre} ({self.tipo_documento}, {self.tamaño}KB)"
-
+    def mostrar(self, nivel=0):
+        indentacion = " " * nivel
+        resultado = f"{indentacion}{self.nombre} (Tipo: {self.tipo}, Tamaño: {self.tamanio} KB)\n"
+        return resultado
+    
     def acceder(self, usuario):
         timestamp = datetime.now()
         info_acceso = f"{usuario} accedió a {self.nombre} en {timestamp}"
@@ -31,29 +36,32 @@ class Documento(Componente):
 # Hoja del Composite - representa un enlace
 class Enlace(Componente):
     def __init__(self, nombre, destino):
-        super().__init__(nombre)
+        super().__init__(nombre, "Enlace")
         self.destino = destino
 
-    def mostrar(self):
-        return f"{self.nombre} (Enlace a {self.destino.mostrar()})"
-
+    def mostrar(self, nivel=0):
+        indentacion = " "*nivel
+        resultado = f"{indentacion}{self.nombre} -> {self.destino.nombre} (Tipo: {self.tipo})\n"
+        return resultado
+    
 # Composite - representa una carpeta
 class Carpeta(Componente):
     def __init__(self, nombre):
-        super().__init__(nombre)
-        self.hijos = []
+        super().__init__(nombre, "Carpeta")
+        self.contenido = []
 
     def agregar(self, componente):
-        self.hijos.append(componente)
+        self.contenido.append(componente)
 
     def eliminar(self, componente):
-        self.hijos.remove(componente)
+        self.contenido.remove(componente)
 
-    def mostrar(self):
-        carpeta_str = f"{self.nombre} (Carpeta)\n"
-        for hijo in self.hijos:
-            carpeta_str += f"  {hijo.mostrar()}\n"
-        return carpeta_str
+    def mostrar(self, nivel=0):
+        indentacion = " "*nivel
+        resultado = super().mostrar(nivel)
+        for elemento in self.contenido:
+            resultado += elemento.mostrar(nivel + 1)
+        return resultado
 
 # Proxy para controlar y registrar el acceso a documentos específicos
 class ProxyAcceso:
@@ -61,21 +69,10 @@ class ProxyAcceso:
         self.usuario = usuario
 
     def acceder_documento(self, documento):
-        if documento.sensible:
-            documento.acceder(self.usuario)
-        else:
-            print(f"{self.usuario} accedió a {documento.nombre}")
+        print(f"Acceso a {documento.nombre} registrado para el usuario {self.usuario}.")
+        documento.accesos.append((self.usuario, str(datetime.now())))
 
-# Funciones de utilidad
-def crear_estructura_ejemplo():
-    doc1 = Documento("Documento1", "Texto", 50, sensible=True)
-    doc2 = Documento("Documento2", "Imagen", 100)
-    enlace = Enlace("Enlace1", doc1)
-    carpeta = Carpeta("Carpeta1")
-    carpeta.agregar(doc2)
-    carpeta.agregar(enlace)
 
-    return carpeta
 
 # Clase para manejar la autenticación de usuarios
 class AutenticacionUsuarios:
@@ -109,10 +106,66 @@ class AutenticacionUsuarios:
                 writer.writerow(user)
 
 
+
+def acceder_a_carpeta_o_enlace(carpeta_personal):
+    while True:
+        print("Seleccione una opción:")
+        print("1. Ver carpetas")
+        print("2. Ver enlaces")
+        print("3. Salir")
+
+        opcion = input("Ingrese su elección: ")
+
+        if opcion == '1':
+            print("Carpetas disponibles:")
+            for i, elemento in enumerate(carpeta_personal.contenido, start=1):
+                if isinstance(elemento, Carpeta):
+                    print(f"{i}. {elemento.nombre}")
+
+            eleccion = input("Seleccione una carpeta: ")
+            try:
+                indice_carpeta = int(eleccion) - 1
+                carpeta_seleccionada = carpeta_personal.contenido[indice_carpeta]
+                if isinstance(carpeta_seleccionada, Carpeta):
+                    return carpeta_seleccionada
+                else:
+                    print("La selección no es una carpeta válida.")
+            except ValueError:
+                print("Por favor, ingrese un número válido.")
+            except IndexError:
+                print("Índice fuera de rango. Inténtelo de nuevo.")
+
+        elif opcion == '2':
+            print("Enlaces disponibles:")
+            for i, elemento in enumerate(carpeta_personal.contenido, start=1):
+                if isinstance(elemento, Enlace):
+                    print(f"{i}. {elemento.nombre} -> {elemento.destino.nombre}")
+
+            eleccion = input("Seleccione un enlace: ")
+            try:
+                indice_enlace = int(eleccion) - 1
+                enlace_seleccionado = carpeta_personal.contenido[indice_enlace]
+                if isinstance(enlace_seleccionado, Enlace):
+                    return enlace_seleccionado.destino
+                else:
+                    print("La selección no es un enlace válido.")
+            except ValueError:
+                print("Por favor, ingrese un número válido.")
+            except IndexError:
+                print("Índice fuera de rango. Inténtelo de nuevo.")
+
+        elif opcion == '3':
+            exit()
+
+        else:
+            print("Opción no válida. Inténtelo de nuevo.")
+
+
 def main():
     autenticacion = AutenticacionUsuarios()
 
     autenticacion.cargar_usuarios_csv()
+    carpeta_personal = None
 
     while True:
         print("1. Iniciar sesión")
@@ -130,7 +183,7 @@ def main():
                 print(f"Bienvenido, {usuario_autenticado}!\n")
                 carpeta_personal = user_data['carpeta_personal']
                 if carpeta_personal is None:
-                    carpeta_personal = crear_estructura_ejemplo()
+                    carpeta_personal = cargar_desde_json('estructura_usuario.json')
                     user_data['carpeta_personal'] = carpeta_personal
                 break
             else:
@@ -139,6 +192,8 @@ def main():
             usuario = input("Nuevo usuario: ")
             contraseña = input("Contraseña: ")
             autenticacion.registrar_usuario(usuario, contraseña)
+            carpeta_personal = cargar_desde_json('estructura_usuario.json')  # Crear o cargar estructura de ejemplo
+            autenticacion.asignar_carpeta_personal(usuario, carpeta_personal)
             print("Usuario registrado exitosamente. Ahora puede iniciar sesión.\n")
         elif opcion == '3':
             exit()
@@ -154,17 +209,17 @@ def main():
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
-            print(carpeta_personal.mostrar())
-            nombre_documento = input("Ingrese el nombre del documento a acceder: ")
-            documento_seleccionado = None
-            for child in carpeta_personal.hijos:
-                if isinstance(child, Documento) and child.nombre == nombre_documento:
-                    documento_seleccionado = child
-                    break
-            if documento_seleccionado:
-                proxy.acceder_documento(documento_seleccionado)
-            else:
-                print("Documento no encontrado.\n")
+            carpeta_actual = carpeta_personal
+            while True:
+                print("Carpeta actual:", carpeta_actual.nombre)
+                carpeta_o_enlace = acceder_a_carpeta_o_enlace(carpeta_actual)
+                if isinstance(carpeta_o_enlace, Documento):
+                    proxy.acceder_documento(carpeta_o_enlace)
+                    print("Interacción ficticia para el documento.")
+                elif isinstance(carpeta_o_enlace, Carpeta):
+                    carpeta_actual = carpeta_o_enlace
+                else:
+                    print("Error desconocido al acceder a carpeta/enlace.")
         elif opcion == '2':
             exit()
         else:

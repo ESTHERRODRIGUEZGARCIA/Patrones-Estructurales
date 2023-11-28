@@ -1,64 +1,111 @@
 {
-    "documentos": [
+    "nombre": "Raiz",
+    "tipo": "Carpeta",
+    "tamaño": 0,
+    "contenido": [
       {
-        "nombre": "Documento1",
-        "tipo_documento": "Texto",
-        "tamaño": 50,
-        "sensible": true
+        "nombre": "CarpetaPrincipal1",
+        "tipo": "Carpeta",
+        "tamaño": 0,
+        "contenido": [
+          {
+            "nombre": "Documento1",
+            "tipo": "Texto",
+            "tamaño": 50,
+            "sensible": true,
+            "accesos": []
+          },
+          {
+            "nombre": "Enlace1",
+            "tipo": "Enlace",
+            "tamaño": 0,
+            "destino": {
+              "nombre": "Documento2",
+              "tipo": "Imagen",
+              "tamaño": 100,
+              "sensible": false,
+              "accesos": []
+            }
+          },
+          {
+            "nombre": "CarpetaSecundaria1",
+            "tipo": "Carpeta",
+            "tamaño": 0,
+            "contenido": [
+              {
+                "nombre": "Documento3",
+                "tipo": "Video",
+                "tamaño": 200,
+                "sensible": true,
+                "accesos": []
+              },
+              {
+                "nombre": "Enlace2",
+                "tipo": "Enlace",
+                "tamaño": 0,
+                "destino": {
+                  "nombre": "Documento4",
+                  "tipo": "Texto",
+                  "tamaño": 80,
+                  "sensible": false,
+                  "accesos": []
+                }
+              }
+            ]
+          }
+        ]
       },
       {
-        "nombre": "Documento2",
-        "tipo_documento": "Imagen",
-        "tamaño": 100,
-        "sensible": false
-      },
-      {
-        "nombre": "Documento3",
-        "tipo_documento": "Video",
-        "tamaño": 200,
-        "sensible": true
-      },
-      {
-        "nombre": "Documento4",
-        "tipo_documento": "Texto",
-        "tamaño": 80,
-        "sensible": false
-      },
-      {
-        "nombre": "Documento5",
-        "tipo_documento": "Imagen",
-        "tamaño": 120,
-        "sensible": true
-      },
-      {
-        "nombre": "Documento6",
-        "tipo_documento": "Audio",
-        "tamaño": 30,
-        "sensible": false
-      },
-      {
-        "nombre": "Documento7",
-        "tipo_documento": "Texto",
-        "tamaño": 60,
-        "sensible": false
-      },
-      {
-        "nombre": "Documento8",
-        "tipo_documento": "Video",
-        "tamaño": 150,
-        "sensible": true
-      },
-      {
-        "nombre": "Documento9",
-        "tipo_documento": "Audio",
-        "tamaño": 40,
-        "sensible": false
-      },
-      {
-        "nombre": "Documento10",
-        "tipo_documento": "Imagen",
-        "tamaño": 90,
-        "sensible": true
+        "nombre": "CarpetaPrincipal2",
+        "tipo": "Carpeta",
+        "tamaño": 0,
+        "contenido": [
+          {
+            "nombre": "Documento5",
+            "tipo": "Audio",
+            "tamaño": 30,
+            "sensible": false,
+            "accesos": []
+          },
+          {
+            "nombre": "Enlace3",
+            "tipo": "Enlace",
+            "tamaño": 0,
+            "destino": {
+              "nombre": "Documento6",
+              "tipo": "Texto",
+              "tamaño": 60,
+              "sensible": false,
+              "accesos": []
+            }
+          },
+          {
+            "nombre": "CarpetaSecundaria2",
+            "tipo": "Carpeta",
+            "tamaño": 0,
+            "contenido": [
+              {
+                "nombre": "Documento7",
+                "tipo": "Imagen",
+                "tamaño": 120,
+                "sensible": true,
+                "accesos": []
+              },
+              {
+                "nombre": "Enlace4",
+                "tipo": "Enlace",
+                "tamaño": 0,
+                "destino": {
+                  "nombre": "Documento8",
+                  "tipo": "Video",
+                  "tamaño": 150,
+                  "sensible": true,
+                  "accesos": []
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
   }
