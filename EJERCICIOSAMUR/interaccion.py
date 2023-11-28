@@ -9,7 +9,7 @@ def mostrar_contenido(elemento):
         print(f"{idx}. {subelemento.nombre} ({subelemento.tipo})")
 
 
-def acceder_a_elemento(elemento):
+def acceder_a_elemento(elemento, usuario):
     while True:
         print(f"\n¿Desea acceder a '{elemento.nombre}'? (Sí/No): ")
         respuesta = input().lower()
@@ -17,23 +17,26 @@ def acceder_a_elemento(elemento):
         if respuesta == 'si':
             mostrar_contenido(elemento)
             nombre_elegido = input("Seleccione el elemento por nombre: ")
-            elemento_elegido = None
 
-            for subelemento in elemento.contenido:
-                if subelemento.nombre == nombre_elegido:
-                    elemento_elegido = subelemento
+            if nombre_elegido.isdigit():
+                idx_elegido = int(nombre_elegido)
+                if 1 <= idx_elegido <= len(elemento.contenido):
+                    elemento_elegido = elemento.contenido[idx_elegido - 1]
+
+                    if isinstance(elemento_elegido, Documento):
+                        proxy_acceso = ProxyAcceso(usuario)
+                        proxy_acceso.acceder_documento(elemento_elegido)
+                    elif isinstance(elemento_elegido, Carpeta):
+                        acceder_a_elemento(elemento_elegido, usuario)
+                    elif isinstance(elemento_elegido, Enlace):
+                        acceder_a_elemento(elemento_elegido.destino, usuario)
                     break
-
-            if elemento_elegido:
-                if isinstance(elemento_elegido, Documento):
-                    print(f"Usuario: {usuario}, ha tenido acceso al archivo {elemento_elegido.nombre}, tipo {elemento_elegido.tipo}, tamaño {elemento_elegido.tamaño}.")
-                elif isinstance(elemento_elegido, Carpeta):
-                    acceder_a_elemento(elemento_elegido)
-                elif isinstance(elemento_elegido, Enlace):
-                    acceder_a_elemento(elemento_elegido.destino)
+                else:
+                    print("Número no válido. Inténtelo de nuevo.")
+            elif nombre_elegido.lower() == 'n':
                 break
             else:
-                print("Elemento no encontrado. Inténtelo de nuevo.")
+                print("Opción no válida. Inténtelo de nuevo.")
 
         elif respuesta == 'no':
             print(f"No hay más carpetas disponibles para acceder. Cerrando el programa.")
