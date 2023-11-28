@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 # Componente base del patrón Composite
 class Componente(ABC):
     @abstractmethod
-    def __init__(self, nombre, tipo):
+    def __init__(self, nombre, tipo, **kwargs):
         self.nombre = nombre
         self.tipo = tipo
 
@@ -16,8 +16,7 @@ class Componente(ABC):
 # Hoja del Composite - representa un documento
 class Documento(Componente):
     def __init__(self, nombre, tipo, tamanio, sensible):
-        super().__init__(nombre)
-        self.tipo = tipo
+        super().__init__(nombre, tipo)
         self.tamanio = tamanio
         self.sensible = sensible
         self.accesos = []
@@ -30,7 +29,7 @@ class Documento(Componente):
     def acceder(self, usuario):
         timestamp = datetime.now()
         info_acceso = f"{usuario} accedió a {self.nombre} en {timestamp}"
-        self.registro_acceso.append(info_acceso)
+        self.accesos.append(info_acceso)
         print(info_acceso)
 
 # Hoja del Composite - representa un enlace
