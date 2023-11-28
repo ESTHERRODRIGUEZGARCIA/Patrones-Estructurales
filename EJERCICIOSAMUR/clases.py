@@ -160,6 +160,28 @@ def acceder_a_carpeta_o_enlace(carpeta_personal):
         else:
             print("Opción no válida. Inténtelo de nuevo.")
 
+def cargar_desde_json(nombre_archivo):
+    with open(nombre_archivo, 'r') as file:
+        data = json.load(file)
+        return cargar_elemento(data)
+
+def cargar_elemento(data):
+    tipo = data.get("tipo")
+    if tipo == "Carpeta":
+        carpeta = Carpeta(data["nombre"])
+        for elemento_data in data["contenido"]:
+            elemento = cargar_elemento(elemento_data)
+            carpeta.agregar(elemento)
+        return carpeta
+    elif tipo == "Documento":
+        return Documento(data["nombre"], data["tipo"], data["tamanio"], data["sensible"])
+    elif tipo == "Enlace":
+        destino = cargar_elemento(data["destino"])
+        return Enlace(data["nombre"], destino)
+    else:
+        raise ValueError(f"Tipo desconocido: {tipo}")
+
+
 
 def main():
     autenticacion = AutenticacionUsuarios()
@@ -192,8 +214,6 @@ def main():
             usuario = input("Nuevo usuario: ")
             contraseña = input("Contraseña: ")
             autenticacion.registrar_usuario(usuario, contraseña)
-            carpeta_personal = cargar_desde_json('estructura_usuario.json')  # Crear o cargar estructura de ejemplo
-            autenticacion.asignar_carpeta_personal(usuario, carpeta_personal)
             print("Usuario registrado exitosamente. Ahora puede iniciar sesión.\n")
         elif opcion == '3':
             exit()
@@ -211,15 +231,19 @@ def main():
         if opcion == '1':
             carpeta_actual = carpeta_personal
             while True:
-                print("Carpeta actual:", carpeta_actual.nombre)
-                carpeta_o_enlace = acceder_a_carpeta_o_enlace(carpeta_actual)
-                if isinstance(carpeta_o_enlace, Documento):
-                    proxy.acceder_documento(carpeta_o_enlace)
-                    print("Interacción ficticia para el documento.")
-                elif isinstance(carpeta_o_enlace, Carpeta):
-                    carpeta_actual = carpeta_o_enlace
+                if isinstance(carpeta_actual, Carpeta):  # Verifica que carpeta_actual sea una instancia de Carpeta
+                    print("Carpeta actual:", carpeta_actual.nombre)
+                    carpeta_o_enlace = acceder_a_carpeta_o_enlace(carpeta_actual)
+                    if isinstance(carpeta_o_enlace, Documento):
+                        proxy.acceder_documento(carpeta_o_enlace)
+                        print("Interacción ficticia para el documento.")
+                    elif isinstance(carpeta_o_enlace, Carpeta):
+                        carpeta_actual = carpeta_o_enlace
+                    else:
+                        print("Error desconocido al acceder a carpeta/enlace.")
                 else:
-                    print("Error desconocido al acceder a carpeta/enlace.")
+                    print("La carpeta actual no es válida.")
+                    break
         elif opcion == '2':
             exit()
         else:
