@@ -1,85 +1,89 @@
 from proxy import ProxyAcceso
-from composite import *
+from composite import Documento, Carpeta, Enlace
+import random
+from cargar_json import cargar_desde_json
 
-def acceder_a_carpeta(carpeta_personal):
+def mostrar_contenido(elemento):
+    print(f"Contenido de '{elemento.nombre}':")
+    for idx, subelemento in enumerate(elemento.contenido, 1):
+        print(f"{idx}. {subelemento.nombre} ({subelemento.tipo})")
+
+
+def acceder_a_elemento(elemento):
     while True:
-        print("1. Acceder a una carpeta")
-        print("2. Volver")
-        opcion = input("Seleccione una opción: ")
-        if opcion == '1':
-            nombre_carpeta = input("Nombre de la carpeta: ")
-            for carpeta in carpeta_personal.contenido:
-                if isinstance(carpeta, Carpeta) and carpeta.nombre == nombre_carpeta:
-                    return carpeta
-            print("No se encontró la carpeta. Inténtelo de nuevo.\n")
-        elif opcion == '2':
-            return carpeta_personal
+        print(f"\n¿Desea acceder a '{elemento.nombre}'? (Sí/No): ")
+        respuesta = input().lower()
+
+        if respuesta == 'si':
+            mostrar_contenido(elemento)
+            nombre_elegido = input("Seleccione el elemento por nombre: ")
+            elemento_elegido = None
+
+            for subelemento in elemento.contenido:
+                if subelemento.nombre == nombre_elegido:
+                    elemento_elegido = subelemento
+                    break
+
+            if elemento_elegido:
+                if isinstance(elemento_elegido, Documento):
+                    print(f"Usuario: {usuario}, ha tenido acceso al archivo {elemento_elegido.nombre}, tipo {elemento_elegido.tipo}, tamaño {elemento_elegido.tamaño}.")
+                elif isinstance(elemento_elegido, Carpeta):
+                    acceder_a_elemento(elemento_elegido)
+                elif isinstance(elemento_elegido, Enlace):
+                    acceder_a_elemento(elemento_elegido.destino)
+                break
+            else:
+                print("Elemento no encontrado. Inténtelo de nuevo.")
+
+        elif respuesta == 'no':
+            print(f"No hay más carpetas disponibles para acceder. Cerrando el programa.")
+            break
+
         else:
-            print("Opción no válida. Inténtelo de nuevo.\n")
+            print("Opción no válida. Inténtelo de nuevo.")
 
-def acceder_a_enlace(carpeta_personal):
-    while True:
-        print("1. Acceder a un enlace")
-        print("2. Volver")
-        opcion = input("Seleccione una opción: ")
-        if opcion == '1':
-            nombre_enlace = input("Nombre del enlace: ")
-            for enlace in carpeta_personal.contenido:
-                if isinstance(enlace, Enlace) and enlace.nombre == nombre_enlace:
-                    return enlace
-            print("No se encontró el enlace. Inténtelo de nuevo.\n")
-        elif opcion == '2':
-            return carpeta_personal
-        else:
-            print("Opción no válida. Inténtelo de nuevo.\n")
+def añadir_elemento_aleatorio(carpeta_actual):
+    nombre = input("Ingrese el nombre del nuevo elemento: ")
 
-def buscar_documento(nombre, carpeta_actual):
-    """
-    Busca un documento por nombre en la carpeta actual y sus subcarpetas recursivamente.
+    # Seleccionar aleatoriamente el tipo de elemento (Documento o Carpeta)
+    tipo_elemento = random.choice(['Documento', 'Carpeta'])
 
-    Parameters:
-    - nombre (str): El nombre del documento a buscar.
-    - carpeta_actual (dict): La carpeta actual en la que se debe realizar la búsqueda.
+    # Generar características aleatorias
+    tipo = random.choice(['Texto', 'Imagen', 'Video', 'Audio'])
+    tamaño = random.randint(1, 200)
+    sensible = random.choice([True, False])
 
-    Returns:
-    - dict or None: Devuelve el documento si se encuentra, o None si no se encuentra.
-    """
-    for documento in carpeta_actual['contenido']:
-        if documento['nombre'] == nombre:
-            return documento
-        elif documento['tipo'] == 'Carpeta':
-            # Si el documento actual es una carpeta, realiza la búsqueda recursiva en esa carpeta.
-            resultado_busqueda = buscar_documento(nombre, documento)
-            if resultado_busqueda:
-                return resultado_busqueda
-
-    # Si no se encuentra el documento en la carpeta actual ni en sus subcarpetas, devuelve None.
-    return None
-
-
-# Función para añadir un nuevo documento a una carpeta
-def añadir_documento(nombre, tipo, tamaño, sensible, accesos, carpeta_actual):
-    nuevo_documento = {
-        "nombre": nombre,
-        "tipo": tipo,
-        "tamaño": tamaño,
-        "sensible": sensible,
-        "accesos": accesos
-    }
-    carpeta_actual['contenido'].append(nuevo_documento)
-
-# Función para eliminar un documento de una carpeta
-def eliminar_documento(nombre, carpeta_actual):
-    documento = buscar_documento(nombre, carpeta_actual)
-    if documento:
-        carpeta_actual['contenido'].remove(documento)
-        print(f"Documento '{nombre}' eliminado.")
+    if tipo_elemento == 'Documento':
+        nuevo_documento = Documento(nombre, tipo, tamaño, sensible, [])
+        carpeta_actual.agregar_elemento(nuevo_documento)
+        print(f"Nuevo documento '{nombre}' añadido a '{carpeta_actual.nombre}'.")
+    elif tipo_elemento == 'Carpeta':
+        nueva_carpeta = Carpeta(nombre, [])
+        carpeta_actual.agregar_elemento(nueva_carpeta)
+        print(f"Nueva carpeta '{nombre}' añadida a '{carpeta_actual.nombre}'.")
     else:
-        print(f"Documento '{nombre}' no encontrado.")
+        print("Error al añadir el elemento. Tipo desconocido.")
 
 
-# Función para mostrar el contenido de una carpeta
-def mostrar_contenido(carpeta_actual):
-    print(f"Contenido de la carpeta '{carpeta_actual['nombre']}':")
-    for documento in carpeta_actual['contenido']:
-        print(f"- {documento['nombre']} ({documento['tipo']})")
+def eliminar_elemento(carpeta_actual):
+    while True:
+        mostrar_contenido(carpeta_actual)
+        nombre_eliminar = input("Seleccione el número del elemento a eliminar o 'n' para cancelar: ")
+        if nombre_eliminar.isdigit():
+            idx_eliminar = int(nombre_eliminar)
+            if 1 <= idx_eliminar <= len(carpeta_actual.contenido):
+                elemento_eliminar = carpeta_actual.contenido[idx_eliminar - 1]
+                carpeta_actual.eliminar_elemento(elemento_eliminar)
+                print(f"Elemento '{elemento_eliminar.nombre}' eliminado.")
+                break
+            else:
+                print("Número no válido. Inténtelo de nuevo.")
+        elif nombre_eliminar.lower() == 'n':
+            break
+        else:
+            print("Opción no válida. Inténtelo de nuevo.")
+
+# Función principal para interactuar con el sistema
+def interactuar_con_sistema(usuario, carpeta_raiz):
+    print(f"Bienvenido, {usuario}.\n")
+    acceder_a_elemento(carpeta_raiz)
