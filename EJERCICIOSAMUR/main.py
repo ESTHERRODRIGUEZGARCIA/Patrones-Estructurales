@@ -1,4 +1,4 @@
-from proxy import ProxyEnlace, ProxyCarpeta, ProxyDocumento
+from proxy import ProxyDocumento
 from composite import Carpeta
 from ver_usuarios import AutenticacionUsuarios
 from cargar_json import cargar_desde_json, guardar_json

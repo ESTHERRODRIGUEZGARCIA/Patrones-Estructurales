@@ -17,14 +17,14 @@ class AutenticacionUsuarios:
 
     def cargar_usuarios_csv(self):
         try:
-            with open('usuarios.csv', newline='') as file:
+            with open('EJERCICIOSAMUR/usuarios.csv', newline='') as file:
                 reader = csv.DictReader(file)
                 self.usuarios = list(reader)
         except FileNotFoundError:
             self.usuarios = []
 
     def guardar_usuarios_csv(self):
-        with open('usuarios.csv', mode='w', newline='') as file:
+        with open('EJERCICIOSAMUR/usuarios.csv', mode='w', newline='') as file:
             fieldnames = ['usuario', 'contraseña', 'carpeta_personal']
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
