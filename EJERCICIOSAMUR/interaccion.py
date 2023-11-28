@@ -1,7 +1,7 @@
 from proxy import ProxyAcceso
 from composite import Documento, Carpeta, Enlace
 import random
-from cargar_json import cargar_desde_json
+from cargar_json import cargar_desde_json, cargar_elemento
 
 def mostrar_contenido(elemento):
     print(f"Contenido de '{elemento.nombre}':")
@@ -47,25 +47,27 @@ def acceder_a_elemento(elemento, usuario):
 
 def añadir_elemento_aleatorio(carpeta_actual):
     nombre = input("Ingrese el nombre del nuevo elemento: ")
+    tipo_elemento = input("Ingrese el tipo del nuevo elemento (Documento/Enlace/Carpeta): ")
 
-    # Seleccionar aleatoriamente el tipo de elemento (Documento o Carpeta)
-    tipo_elemento = random.choice(['Documento', 'Carpeta'])
-
-    # Generar características aleatorias
-    tipo = random.choice(['Texto', 'Imagen', 'Video', 'Audio'])
-    tamaño = random.randint(1, 200)
-    sensible = random.choice([True, False])
-
-    if tipo_elemento == 'Documento':
-        nuevo_documento = Documento(nombre, tipo, tamaño, sensible, [])
-        carpeta_actual.agregar_elemento(nuevo_documento)
+    if tipo_elemento.lower() == 'documento':
+        tipo = input("Ingrese el tipo del documento (Texto/Imagen/Video/Audio): ")
+        tamaño = int(input("Ingrese el tamaño del documento en KB: "))
+        sensible = input("¿El documento es sensible? (Sí/No): ").lower() == 'si'
+        nuevo_documento = Documento(nombre, tipo, tamaño, sensible)
+        carpeta_actual.agregar(nuevo_documento)
         print(f"Nuevo documento '{nombre}' añadido a '{carpeta_actual.nombre}'.")
-    elif tipo_elemento == 'Carpeta':
-        nueva_carpeta = Carpeta(nombre, [])
-        carpeta_actual.agregar_elemento(nueva_carpeta)
+    elif tipo_elemento.lower() == 'enlace':
+        destino_nombre = input("Ingrese el nombre del destino del enlace: ")
+        destino = cargar_elemento(destino_nombre, carpeta_actual)  # Puedes ajustar esta función según sea necesario
+        nuevo_enlace = Enlace(nombre, destino)
+        carpeta_actual.agregar(nuevo_enlace)
+        print(f"Nuevo enlace '{nombre}' añadido a '{carpeta_actual.nombre}'.")
+    elif tipo_elemento.lower() == 'carpeta':
+        nueva_carpeta = Carpeta(nombre)
+        carpeta_actual.agregar(nueva_carpeta)
         print(f"Nueva carpeta '{nombre}' añadida a '{carpeta_actual.nombre}'.")
     else:
-        print("Error al añadir el elemento. Tipo desconocido.")
+        print("Tipo de elemento no válido.")
 
 
 def eliminar_elemento(carpeta_actual):
