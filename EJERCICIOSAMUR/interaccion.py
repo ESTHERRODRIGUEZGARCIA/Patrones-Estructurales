@@ -1,6 +1,5 @@
 from proxy import ProxyAcceso
 from composite import Documento, Carpeta, Enlace
-import random
 from cargar_json import cargar_desde_json, cargar_elemento
 
 def mostrar_contenido(elemento):
@@ -26,10 +25,9 @@ def acceder_a_elemento(elemento, usuario):
                     if isinstance(elemento_elegido, Documento):
                         proxy_acceso = ProxyAcceso(usuario)
                         proxy_acceso.acceder_documento(elemento_elegido)
-                    elif isinstance(elemento_elegido, Carpeta):
+                        print("Interacción ficticia para el documento.")
+                    elif isinstance(elemento_elegido, Carpeta) or isinstance(elemento_elegido, Enlace):
                         acceder_a_elemento(elemento_elegido, usuario)
-                    elif isinstance(elemento_elegido, Enlace):
-                        acceder_a_elemento(elemento_elegido.destino, usuario)
                     break
                 else:
                     print("Número no válido. Inténtelo de nuevo.")

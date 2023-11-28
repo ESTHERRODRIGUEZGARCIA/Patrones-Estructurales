@@ -1,5 +1,5 @@
 from proxy import ProxyAcceso
-from composite import Carpeta, Documento, Enlace
+from composite import Carpeta
 from ver_usuarios import AutenticacionUsuarios
 from cargar_json import cargar_desde_json
 from interaccion import acceder_a_elemento, añadir_elemento_aleatorio, eliminar_elemento
