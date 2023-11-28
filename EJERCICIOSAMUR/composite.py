@@ -13,6 +13,9 @@ class Componente(ABC):
         resultado = f"{indentacion}{self.nombre}/ (Tipo: {self.tipo})\n"
         return resultado
 
+    @abstractmethod
+    def acceder(self, usuario):
+        pass
 # Hoja del Composite - representa un documento
 class Documento(Componente):
     def __init__(self, nombre, tipo, tamanio, sensible):
@@ -43,6 +46,9 @@ class Enlace(Componente):
         resultado = f"{indentacion}{self.nombre} -> {self.destino.nombre} (Tipo: {self.tipo})\n"
         return resultado
     
+    def acceder(self, usuario):
+        self.destino.acceder(usuario)
+    
 # Composite - representa una carpeta
 class Carpeta(Componente):
     def __init__(self, nombre):
@@ -61,3 +67,8 @@ class Carpeta(Componente):
         for elemento in self.contenido:
             resultado += elemento.mostrar(nivel + 1)
         return resultado
+    
+    def acceder(self, usuario):
+        print(f"{usuario} accedió a la carpeta {self.nombre}")
+        for elemento in self.contenido:
+            elemento.acceder(usuario)
