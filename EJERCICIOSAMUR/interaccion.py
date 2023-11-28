@@ -78,7 +78,7 @@ def eliminar_elemento(carpeta_actual):
             idx_eliminar = int(nombre_eliminar)
             if 1 <= idx_eliminar <= len(carpeta_actual.contenido):
                 elemento_eliminar = carpeta_actual.contenido[idx_eliminar - 1]
-                carpeta_actual.eliminar_elemento(elemento_eliminar)
+                carpeta_actual.eliminar(elemento_eliminar)
                 print(f"Elemento '{elemento_eliminar.nombre}' eliminado.")
                 break
             else:
